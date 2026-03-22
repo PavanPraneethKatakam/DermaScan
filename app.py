@@ -50,9 +50,9 @@ MODEL = load_model()
 # Preprocessing / postprocessing helpers
 # ---------------------------------------------------------------------------
 
-def preprocess(img: np.ndarray) -> torch.Tensor:
+def preprocess(pil_img: Image.Image) -> torch.Tensor:
     """Resize, normalise (ImageNet), convert to tensor."""
-    pil = Image.fromarray(img).convert("RGB").resize((IMAGE_SIZE, IMAGE_SIZE))
+    pil = pil_img.convert("RGB").resize((IMAGE_SIZE, IMAGE_SIZE))
     arr = np.array(pil, dtype=np.float32) / 255.0
     arr = (arr - IMAGENET_MEAN) / IMAGENET_STD          # (H, W, 3)
     tensor = torch.from_numpy(arr.transpose(2, 0, 1))   # (3, H, W)
@@ -84,20 +84,26 @@ def make_overlay(original_rgb: np.ndarray, mask: np.ndarray) -> np.ndarray:
 # Inference function (called by Gradio)
 # ---------------------------------------------------------------------------
 
-def segment(image: np.ndarray):
+def segment(image_path: str):
     """Run inference and return (mask_image, overlay_image)."""
-    if image is None:
+    if not image_path:
         return None, None
 
-    tensor = preprocess(image)
+    pil_img = Image.open(image_path).convert("RGB")
+    tensor = preprocess(pil_img)
     with torch.no_grad():
         pred = MODEL(tensor)         # (1, 1, 256, 256)
 
     mask   = postprocess_mask(pred)  # (256, 256) uint8
-    overlay = make_overlay(image, mask)
+    
+    # Needs numpy array for overlay drawing
+    orig_np = np.array(pil_img)
+    overlay = make_overlay(orig_np, mask)
 
     mask_rgb = np.stack([mask, mask, mask], axis=-1)  # grey → RGB for display
-    return mask_rgb, overlay
+    
+    # Return explicit PIL Images, avoiding gradio numpy bugs
+    return Image.fromarray(mask_rgb), Image.fromarray(overlay)
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +128,7 @@ with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as
 
     with gr.Row():
         with gr.Column():
-            inp = gr.Image(label="Input Image", type="numpy")
+            inp = gr.Image(label="Input Image", type="filepath")
             btn = gr.Button("Segment 🔍", variant="primary")
         with gr.Column():
             out_mask    = gr.Image(label="Predicted Mask")
