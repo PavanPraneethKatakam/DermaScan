@@ -128,7 +128,12 @@ with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as
             out_mask    = gr.Image(label="Predicted Mask")
             out_overlay = gr.Image(label="Overlay on Original")
 
-    btn.click(fn=segment, inputs=inp, outputs=[out_mask, out_overlay])
+    btn.click(
+        fn=segment,
+        inputs=inp,
+        outputs=[out_mask, out_overlay],
+        api_name="predict"
+    )
 
     gr.Examples(
         examples=[],
