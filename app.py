@@ -123,7 +123,7 @@ Upload a dermoscopy image to get an instant binary segmentation mask from a trai
 *Trained on ISIC 2018 Task 1 (568 images, 70/15/15 split).*
 """
 
-with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as demo:
+with gr.Blocks(title="ISIC Skin Lesion Segmentation") as demo:
     gr.Markdown(DESCRIPTION)
 
     with gr.Row():
@@ -131,8 +131,8 @@ with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as
             inp = gr.Image(label="Input Image", type="pil")
             btn = gr.Button("Segment 🔍", variant="primary")
         with gr.Column():
-            out_mask    = gr.Image(label="Predicted Mask")
-            out_overlay = gr.Image(label="Overlay on Original")
+            out_mask    = gr.Image(label="Predicted Mask", type="pil")
+            out_overlay = gr.Image(label="Overlay on Original", type="pil")
 
     btn.click(
         fn=segment,
@@ -144,4 +144,4 @@ with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as
 
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(theme=gr.themes.Soft())
