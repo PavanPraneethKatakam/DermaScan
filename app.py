@@ -141,10 +141,7 @@ with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as
         api_name="predict"
     )
 
-    gr.Examples(
-        examples=[],
-        inputs=inp,
-    )
+
 
 if __name__ == "__main__":
     demo.launch()
