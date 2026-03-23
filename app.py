@@ -84,12 +84,12 @@ def make_overlay(original_rgb: np.ndarray, mask: np.ndarray) -> np.ndarray:
 # Inference function (called by Gradio)
 # ---------------------------------------------------------------------------
 
-def segment(image_path: str):
+def segment(pil_img):
     """Run inference and return (mask_image, overlay_image)."""
-    if not image_path:
+    if pil_img is None:
         return None, None
 
-    pil_img = Image.open(image_path).convert("RGB")
+    pil_img = pil_img.convert("RGB")
     tensor = preprocess(pil_img)
     with torch.no_grad():
         pred = MODEL(tensor)         # (1, 1, 256, 256)
@@ -128,7 +128,7 @@ with gr.Blocks(theme=gr.themes.Soft(), title="ISIC Skin Lesion Segmentation") as
 
     with gr.Row():
         with gr.Column():
-            inp = gr.Image(label="Input Image", type="filepath")
+            inp = gr.Image(label="Input Image", type="pil")
             btn = gr.Button("Segment 🔍", variant="primary")
         with gr.Column():
             out_mask    = gr.Image(label="Predicted Mask")
