@@ -1,36 +1,40 @@
 ---
-title: ISIC Skin Lesion Segmentation
+title: DermaScan AI
 emoji: 🔬
 colorFrom: indigo
 colorTo: purple
-sdk: gradio
-sdk_version: "6.9.0"
-python_version: "3.10"
-app_file: app.py
+sdk: streamlit
+sdk_version: "1.44.1"
+python_version: "3.11"
+app_file: dermascan_app.py
 pinned: false
 ---
 
-# ISIC 2018 Skin Lesion Segmentation — U-Net
+# DermaScan AI — Clinical Skin Lesion Analysis
 
-Upload a dermoscopy image to get an instant binary segmentation mask from a trained U-Net.
+Upload a dermoscopy image for **full clinical ABCDE analysis**, risk scoring,
+measurements, Grad-CAM explainability, and a downloadable report — all powered
+by a trained **U-Net** (ISIC 2018, Dice 0.854).
 
-## Results
+## Features
 
-| Metric | Test Set |
-|--------|----------|
-| Dice   | **0.9301 ± 0.0621** |
-| IoU    | **0.8744 ± 0.0891** |
+| Feature | Description |
+|---|---|
+| 🎯 Segmentation | U-Net binary mask with green overlay |
+| 🔬 ABCDE Analysis | Asymmetry, Border, Color, Diameter — all computed from the mask |
+| 📊 Risk Score | Weighted 0–10 gauge with LOW / MEDIUM / HIGH level |
+| 📐 Measurements | Area (mm²), Perimeter, Coverage, Bounding box |
+| 🧠 Grad-CAM | Model explainability heatmap |
+| 📅 Evolution | Upload a previous scan to track lesion growth |
+| 📄 Report | Downloadable PDF + text clinical report |
 
-Trained on **ISIC 2018 Task 1** (568 images, 70/15/15 train/val/test split).  
-Best checkpoint: epoch **45**, val Dice **0.9207**.
+## Model
 
-## Model Architecture
+- Architecture: **U-Net** with skip connections
+- Dataset: **ISIC 2018 Task 1** (568 images, 70/15/15 split)
+- Loss: **BCE + Dice** (50/50)
+- Test Dice: **0.8543 ± 0.0821**
+- Weights hosted at: `pavanpraneeth/isic-unet`
 
-Classic **U-Net** with skip connections.  
-Channel progression: 3 → 64 → 128 → 256 → 512 → 1024 → 512 → 256 → 128 → 64 → 1
-
-## Usage
-
-1. Upload any dermoscopy / skin lesion image
-2. Click **Segment 🔍**
-3. View the predicted binary mask and overlay
+> ⚠️ **Disclaimer:** DermaScan AI is a research/screening tool only.
+> It does NOT constitute a medical diagnosis. Always consult a qualified dermatologist.
